@@ -19,11 +19,12 @@
       padding: 0;
       display: block;
     }
-    
+
     /* 外部コンテナ：幅390px、縦方向レイアウト */
     .container {
       display: flex;
       width: 390px;
+      height: 659px;
       flex-direction: column;
       align-items: flex-start;
       margin: 0 auto;
@@ -377,7 +378,7 @@
       <!-- セグメント（タブ） -->
       <div class="segment-container">
         <!-- コメントタブ -->
-        <button class="tab comment-tab active" onclick="selectTab('comment')">
+        <button class="tab comment-tab" onclick="selectTab('comment')">
           <svg class="tab-icon" xmlns="http://www.w3.org/2000/svg" width="21" height="20" viewBox="0 0 21 20" fill="none">
             <path
               d="M6.75854 16.5015C7.85979 17.1366 9.13751 17.5 10.5001 17.5C14.6422 17.5 18 14.1421 18 10C18 5.85786 14.6421 2.5 10.5 2.5C6.35786 2.5 3 5.85786 3 10C3 11.3626 3.36337 12.6403 3.99849 13.7416L3.99902 13.7425C4.06142 13.8507 4.09269 13.9049 4.1068 13.9559C4.11996 14.0036 4.12431 14.0461 4.12094 14.0954C4.11736 14.1477 4.09929 14.2019 4.06357 14.309L4.06223 14.313L3.42155 16.2351L3.42105 16.2366C3.28567 16.6427 3.21795 16.8459 3.26616 16.9811C3.30817 17.0989 3.401 17.1916 3.5188 17.2336C3.65417 17.2819 3.85794 17.2141 4.26506 17.0784L6.18711 16.4377L6.18844 16.4372C6.29734 16.4009 6.35177 16.3828 6.40452 16.3792C6.45382 16.3758 6.49648 16.3801 6.54411 16.3932C6.59528 16.4074 6.64975 16.4387 6.75854 16.5015Z"
@@ -387,7 +388,7 @@
         </button>
 
         <!-- グラフタブ -->
-        <button class="tab graph-tab" onclick="selectTab('graph')">
+        <button class="tab graph-tab active" onclick="selectTab('graph')">
           <svg class="tab-icon" xmlns="http://www.w3.org/2000/svg" width="21" height="20" viewBox="0 0 21 20" fill="none">
             <path
               d="M8.25 16.6666V9.16659H4.58301C4.1163 9.16659 3.88318 9.16659 3.70492 9.25741C3.54811 9.33731 3.42072 9.4648 3.34083 9.6216C3.25 9.79986 3.25 10.0332 3.25 10.4999V16.6666H8.25ZM8.25 16.6666H13.25M8.25 16.6666V4.66657C8.25 4.19985 8.25 3.96653 8.34083 3.78827C8.42072 3.63147 8.54811 3.50397 8.70492 3.42408C8.88318 3.33325 9.1163 3.33325 9.58301 3.33325H11.9163C12.3831 3.33325 12.6171 3.33325 12.7953 3.42408C12.9521 3.50397 13.079 3.63147 13.1589 3.78827C13.2497 3.96653 13.25 4.19985 13.25 4.66657V16.6666M13.25 16.6666L18.25 16.6666V7.9999C18.25 7.53319 18.2497 7.29986 18.1589 7.1216C18.079 6.9648 17.9521 6.83731 17.7953 6.75741C17.6171 6.66659 17.3834 6.66659 16.9167 6.66659H13.25V16.6666Z"
@@ -440,8 +441,6 @@
     console.log("Chrome mobile layout loaded.");
 
     function selectTab(tab) {
-      console.log("Selected tab:", tab); // 選択されたタブをログに出力
-
       // すべてのタブを非アクティブにする
       document.querySelectorAll('.tab').forEach(tabElement => {
         tabElement.classList.remove('active');
@@ -457,6 +456,12 @@
         if (selectedTabText) selectedTabText.classList.remove('hidden'); // .tab-textがある場合のみ表示
       }
     }
+
+    // ページ読み込み時にグラフをデフォルトで選択
+    document.addEventListener("DOMContentLoaded", function () {
+      selectTab('graph');
+    });
+
   </script>
 </body>
 
