@@ -3,8 +3,8 @@
   "short_name": "PWA",
   "start_url": "/YAV-demo_mobile/index.html",
   "display": "standalone",
-  "background_color": "#0C0D11",  // ← 背景色（アプリの背景と統一すると良い）
-  "theme_color": "#0C0D11", // ← ステータスバーの色（変更したい色）
+  "background_color": "#0C0D11",
+  "theme_color": "#0C0D11",
   "icons": [
     {
       "src": "/YAV-demo_mobile/icons/icon-192x192.png",
