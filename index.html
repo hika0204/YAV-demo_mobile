@@ -7,6 +7,9 @@
   <title>PWA Test</title>
   <link rel="manifest" href="manifest.json">
   <base href="/YAV-demo_mobile/">  <!-- ここを追加！ -->
+  <meta name="theme-color" content="#0C0D11"> <!-- Android向け -->
+  <meta name="apple-mobile-web-app-capable" content="yes"> <!-- iOSでPWAをフルスクリーン化 -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"> <!-- ステータスバーの背景色を変更 -->
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("service-worker.js")
