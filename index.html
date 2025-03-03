@@ -1,216 +1,604 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PWA UI Demo</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0C0D11">
+  <title>YAV - Home</title>
+  <meta name="theme-color" content="#161825">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <style>
     /* カラーパレット */
     :root {
-      --back-primary: #0C0D11;
-      --back-primary02: #6745F1;
-      --back-primary03: #3E3E5D;
+      --back-primary: #161825;
+      --back-secondary: rgba(255, 255, 255, 0.10);
+      --back-border: rgba(255, 255, 255, 0.50);
       --text-white: #FFF;
+      --text-gray: #666974;
+      --border-gray: #343434;
+      --bg-thumbnail: #585858;
     }
 
-    /* ベーススタイル */
+    /* body のデフォルトマージンを削除 */
     body {
       margin: 0;
       padding: 0;
-      font-family: Helvetica, sans-serif;
-      background: var(--back-primary);
-      color: var(--text-white);
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
-      height: 100vh;
+      align-items: center;
+      width: 100vw; /* 画面幅いっぱいに */
+      height: 100vh; /* 画面高さいっぱいに */
+      background: var(--back-primary);
+      overflow: hidden; /* はみ出し要素を非表示 */
     }
 
-    /* コンテナ */
+
+    /* 全体のコンテナ */
     .container {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      width: 390px;
-      max-width: 100%;
+      width: 100%; /* 画面幅に合わせて調整 */
+      height: 100vh; /* 画面全体にフィット */
+      padding: 0px 16px;
+      justify-content: center;
+      align-items: flex-start;
+      background: #161825;
+      backdrop-filter: blur(2px);
+      overflow: hidden;
+      position: relative;
     }
 
-    /* ヘッダー */
+
+
+    /* ヘッダー全体 */
     .header {
       display: flex;
-      height: 50px;
-      padding: 8px 16px;
-      justify-content: flex-end;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      align-self: stretch;
+      position: fixed;
+      top: 16px; /* 画面上部から16pxの余白を確保 */
+      left: 16px;
+      right: 16px;
+      z-index: 1000; /* 他の要素より上に配置 */
+    }
+
+    /* ヘッダー内包コンテナ */
+    .header-container {
+      display: flex;
+      height: 48px;
+      padding: 0px 24px;
+      justify-content: space-between;
       align-items: center;
-      gap: 16px;
-      width: 100%;
-      background: var(--back-primary);
+      align-self: stretch;
+      border-radius: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.50);
+      background: rgba(255, 255, 255, 0.10);
+      backdrop-filter: blur(10px);
       box-sizing: border-box;
     }
 
-    /* 検索バー */
-    .search-container {
+    /* 左側 (ハンバーガーメニュー) */
+    .header-left {
       display: flex;
-      padding: 0px 12px;
-      justify-content: flex-end;
       align-items: center;
-      gap: 10px;
-      flex: 1;
-      border-radius: 16px;
-      border: 1px solid var(--back-primary03);
     }
 
-    /* 解析前の埋め込みエリア */
-    .pre-embed-container {
-      display: flex;
-      height: 219px;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      background: #000;
-    }
-
-    /* セグメント選択 */
-    .segment-container {
-      display: flex;
-      width: 100%;
-      max-width: 390px;
-      height: 30px;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* 各タブ */
-    .tab {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      border-radius: 8px;
-      border: 1px solid var(--back-primary03);
-      background: transparent;
-      color: var(--back-primary03);
+    /* 中央 (ロゴ) */
+    .header-logo {
+      font-family: "LINE Seed JP_OTF", sans-serif;
       font-size: 16px;
-      padding: 4px 8px;
+      font-weight: 800;
+      color: white;
+    }
+
+    /* 右側 (表示切替 & ソートアイコン) */
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* アイコンコンテナ (すべてのアイコンを 24x24 に統一) */
+    .hamburger-menu,
+    .view-switch,
+    .sort-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       cursor: pointer;
-      transition: all 0.3s ease-in-out;
+    }
+
+    /* ホバー時のアニメーション */
+    .view-switch:hover,
+    .sort-icon:hover,
+    .hamburger-menu:hover {
+      transform: scale(1.1);
+    }
+
+
+
+
+    /* ウォッチリスト：スクロール可能にする */
+    .watchlist {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 32px;
+      flex-grow: 1;
+      width: 100%;
+      padding-top: 80px;
+      /* ヘッダーの高さ分 */
+      padding-bottom: 100px;
+      /* ボトムナビ分 */
+      overflow-y: auto;
+      /* 縦スクロール可能 */
+      height: calc(100vh - 96px);
+      /* ヘッダー & ボトムの分を差し引く */
+      position: relative;
+    }
+
+    /* スクロールバーのカスタマイズ */
+    .watchlist::-webkit-scrollbar {
+      width: 4px; /* 横幅を狭く */
+      display: none; /* デフォルトで非表示 */
+      position: absolute; /* これで親要素の影響を無視 */
+      right: 0px; /* 画面の右端に配置 */
+    }
+
+    .watchlist.scrolling::-webkit-scrollbar {
+      display: block; /* スクロール時に表示 */
+    }
+
+    /* スクロールバーのスライダー */
+    .watchlist::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.3);
+      border-radius: 4px;
+      height: 50%; /* スクロールバーの長さ */
+      opacity: 0; /* デフォルトでは透明 */
+      transition: opacity 0.3s ease-in-out; /* ふわっと表示 */
+    }
+
+    .watchlist.scrolling::-webkit-scrollbar-thumb {
+      opacity: 1; /* スクロール時のみ表示 */
+    }
+
+
+
+
+    /* ウォッチリストタイトル */
+    .watchlist-title {
+      color: var(--text-white);
+      font-family: "Hiragino Kaku Gothic ProN", sans-serif;
+      font-size: 32px;
+      font-weight: 600;
+      line-height: 100%;
+    }
+
+    /* 各リストグループ */
+    .watchlist-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      width: 100%;
+    }
+
+    /* リストのタイトル */
+    .watchlist-group-title {
+      color: var(--text-gray);
+      font-family: "Hiragino Kaku Gothic ProN", sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 100%;
+    }
+
+    /* リスト格納コンテナ */
+    .watchlist-items {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 100%;
+    }
+
+    /* 各リストアイテム */
+    .watchlist-item {
+      display: flex;
+      padding: 16px 0;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      border-top: 0.5px solid var(--border-gray);
+      border-bottom: 0.5px solid var(--border-gray);
+    }
+
+    /* サムネイル */
+    .watchlist-thumbnail {
+      width: 64px;
+      height: 36px;
+      aspect-ratio: 16/9;
+      border-radius: 2px;
+      background: var(--bg-thumbnail);
+    }
+
+    /* タイトルと投稿チャンネルコンテナ */
+    .watchlist-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
       flex: 1;
     }
 
-    /* 選択時 */
-    .tab.active {
-      background: var(--back-primary02);
-      box-shadow: 0px 0px 4px 0px #6745F1;
-      border: none;
-      color: white;
-      flex: 2;
+    /* 動画タイトル */
+    .watchlist-title-text {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text-white);
+      font-family: "Hiragino Kaku Gothic ProN", sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 20px;
     }
 
-    /* グラフ表示エリア */
-    .graph-display-area {
+    /* 投稿チャンネル */
+    .watchlist-channel {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text-white);
+      font-family: "Hiragino Kaku Gothic ProN", sans-serif;
+      font-size: 12px;
+      font-weight: 300;
+      line-height: 100%;
+    }
+
+    /* ボトムナビゲーション */
+    .bottom-nav {
       display: flex;
-      padding: 4px;
+      position: fixed;
+      bottom: 16px;
+      /* 下部に固定 */
+      left: 16px;
+      right: 16px;
+      width: calc(100% - 32px);
+      /* 両側16pxのスペース */
+      height: 64px;
+      padding: 0px 8px;
+      justify-content: center;
+      align-items: center;
+      border-radius: 128px;
+      border: 1px solid rgba(255, 255, 255, 0.50);
+      background: rgba(255, 255, 255, 0.10);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      /* ヘッダーと同じく最前面に配置 */
+      box-sizing: border-box;
+    }
+
+
+
+    /* ナビゲーションアイテム */
+    .nav-item {
+      display: flex;
       flex-direction: column;
       justify-content: center;
-      align-items: flex-start;
-      width: 100%;
-      background: #222;
-      color: var(--text-white);
-    }
-
-    /* グラフ種類選択セグメント */
-    .graph-segment {
-      display: flex;
-      padding: 4px;
-      align-items: flex-start;
-      gap: 4px;
-      width: 100%;
-      border-radius: 8px;
-      border: 1px solid var(--back-primary03);
-      background: var(--back-primary);
-    }
-
-    /* 各グラフボタン */
-    .graph-tab {
-      display: flex;
-      width: 42px;
-      justify-content: center;
       align-items: center;
-      aspect-ratio: 1/1;
-      border-radius: 4px;
-      background: transparent;
+      gap: 4px;
+      flex: 1 0 0;
       cursor: pointer;
       transition: all 0.3s ease-in-out;
-      border: none;
     }
 
-    /* 選択状態 */
-    .graph-tab.active {
-      background: var(--back-primary02);
-      box-shadow: 0px 0px 10px 0px #6745F1;
+    /* アイコンのサイズ */
+    .nav-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
+    /* テキスト（未選択時） */
+    .nav-text {
+      color: #909090;
+      text-align: center;
+      font-family: "Hiragino Kaku Gothic ProN", sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      line-height: 100%;
+      text-shadow: none;
+      transition: color 0.3s ease-in-out;
+    }
+
+    /* アクティブ（選択中）のスタイル */
+    .nav-item.active .nav-text {
+      color: #F0F3FA;
+      text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.50);
+    }
+
+    .nav-item.active svg path {
+      fill: white;
+      /* アイコンを白くする */
+    }
   </style>
-  <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("service-worker.js")
-        .then(() => console.log("Service Worker Registered"))
-        .catch(error => console.log("Service Worker Registration Failed:", error));
-    }
-
-    function selectTab(tab) {
-      document.querySelectorAll('.tab').forEach(tabElement => {
-        tabElement.classList.remove('active');
-      });
-      document.querySelector(`.${tab}-tab`).classList.add('active');
-    }
-
-    function selectGraph(type) {
-      document.querySelectorAll('.graph-tab').forEach(tabElement => {
-        tabElement.classList.remove('active');
-      });
-      document.querySelector(`.${type}-tab`).classList.add('active');
-    }
-
-  </script>
 </head>
+
 <body>
   <div class="container">
     <!-- ヘッダー -->
-    <div class="header">
-      <div class="search-container">
-        🔍
+    <header class="header">
+      <div class="header-container">
+        <!-- 左側 (ハンバーガーメニュー) -->
+        <div class="header-left">
+          <div class="hamburger-menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M5 17H19M5 12H19M5 7H19" stroke="white" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- 中央 (ロゴ) -->
+        <div class="header-logo">YAV</div>
+
+        <!-- 右側 (表示切替 & ソートアイコン) -->
+        <div class="header-right">
+          <div class="view-switch">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path
+                d="M4.5 8.49512C3.47 8.49512 2.9 8.49512 2.35 8.26512C1.62 7.96512 1.03 7.37512 0.73 6.64512C0.5 6.09512 0.5 5.52512 0.5 4.49512C0.5 3.46512 0.5 2.89512 0.73 2.34512C1.03 1.60512 1.61 1.03512 2.35 0.725117C2.9 0.495117 3.47 0.495117 4.5 0.495117C5.53 0.495117 6.1 0.495117 6.65 0.725117C7.39 1.03512 7.97 1.60512 8.27 2.34512C8.5 2.89512 8.5 3.46512 8.5 4.49512C8.5 5.52512 8.5 6.09512 8.27 6.64512C7.97 7.37512 7.38 7.96512 6.65 8.26512C6.1 8.49512 5.53 8.49512 4.5 8.49512ZM4.5 2.49512C3.78 2.49512 3.3 2.49512 3.12 2.57512C2.87 2.67512 2.68 2.86512 2.58 3.11512C2.5 3.30512 2.5 3.77512 2.5 4.49512C2.5 5.21512 2.5 5.69512 2.58 5.87512C2.68 6.11512 2.88 6.31512 3.12 6.41512C3.3 6.49512 3.78 6.49512 4.5 6.49512C5.22 6.49512 5.7 6.49512 5.88 6.41512C6.12 6.31512 6.32 6.11512 6.42 5.87512C6.5 5.69512 6.5 5.21512 6.5 4.49512C6.5 3.77512 6.5 3.29512 6.42 3.11512C6.32 2.86512 6.13 2.67512 5.88 2.57512C5.7 2.49512 5.22 2.49512 4.5 2.49512Z"
+                fill="white" />
+              <path
+                d="M4.5 17.4951C3.47 17.4951 2.9 17.4951 2.35 17.2651C1.61 16.9551 1.03 16.3851 0.73 15.6451C0.5 15.0951 0.5 14.5251 0.5 13.4951C0.5 12.4651 0.5 11.8951 0.73 11.3451C1.03 10.6151 1.62 10.0251 2.35 9.72512C2.9 9.49512 3.47 9.49512 4.5 9.49512C5.53 9.49512 6.1 9.49512 6.65 9.72512C7.38 10.0251 7.97 10.6151 8.27 11.3451C8.5 11.8951 8.5 12.4651 8.5 13.4951C8.5 14.5251 8.5 15.0851 8.27 15.6451C7.96 16.3851 7.39 16.9651 6.65 17.2751C6.1 17.5051 5.53 17.5051 4.5 17.5051V17.4951ZM4.5 11.4951C3.78 11.4951 3.3 11.4951 3.12 11.5751C2.88 11.6751 2.68 11.8751 2.58 12.1151C2.5 12.2951 2.5 12.7751 2.5 13.4951C2.5 14.2151 2.5 14.6951 2.58 14.8751C2.68 15.1251 2.87 15.3151 3.12 15.4151C3.3 15.4951 3.78 15.4951 4.5 15.4951C5.22 15.4951 5.7 15.4951 5.88 15.4151C6.13 15.3151 6.32 15.1251 6.42 14.8751C6.5 14.6851 6.5 14.1851 6.5 13.4951C6.5 12.7751 6.5 12.2951 6.42 12.1051C6.32 11.8651 6.12 11.6651 5.88 11.5651C5.7 11.4851 5.22 11.4851 4.5 11.4851V11.4951Z"
+                fill="white" />
+              <path
+                d="M13.5 8.49512C12.47 8.49512 11.9 8.49512 11.35 8.26512C10.61 7.95512 10.03 7.38512 9.73 6.64512C9.5 6.09512 9.5 5.52512 9.5 4.49512C9.5 3.46512 9.5 2.89512 9.73 2.34512C10.04 1.60512 10.61 1.02512 11.35 0.725117C11.9 0.495117 12.47 0.495117 13.5 0.495117C14.53 0.495117 15.1 0.495117 15.65 0.725117C16.38 1.02512 16.97 1.61512 17.27 2.34512C17.5 2.89512 17.5 3.46512 17.5 4.49512C17.5 5.52512 17.5 6.09512 17.27 6.64512C16.97 7.37512 16.38 7.96512 15.65 8.26512C15.1 8.49512 14.53 8.49512 13.5 8.49512ZM13.5 2.49512C12.78 2.49512 12.3 2.49512 12.12 2.57512C11.87 2.67512 11.68 2.86512 11.58 3.11512C11.5 3.29512 11.5 3.77512 11.5 4.49512C11.5 5.21512 11.5 5.69512 11.58 5.87512C11.68 6.12512 11.87 6.31512 12.12 6.41512C12.3 6.49512 12.78 6.49512 13.5 6.49512C14.22 6.49512 14.7 6.49512 14.88 6.41512C15.12 6.31512 15.32 6.11512 15.42 5.87512C15.5 5.69512 15.5 5.21512 15.5 4.49512C15.5 3.77512 15.5 3.29512 15.42 3.11512C15.32 2.87512 15.12 2.67512 14.88 2.57512C14.7 2.49512 14.22 2.49512 13.5 2.49512Z"
+                fill="white" />
+              <path
+                d="M13.5 17.4951C12.47 17.4951 11.9 17.4951 11.35 17.2651C10.62 16.9651 10.03 16.3751 9.73 15.6451C9.5 15.0951 9.5 14.5251 9.5 13.4951C9.5 12.4651 9.5 11.8951 9.73 11.3451C10.03 10.6051 10.61 10.0251 11.35 9.72512C11.9 9.49512 12.47 9.49512 13.5 9.49512C14.53 9.49512 15.1 9.49512 15.65 9.72512C16.39 10.0351 16.97 10.6051 17.27 11.3451C17.5 11.8951 17.5 12.4651 17.5 13.4951C17.5 14.5251 17.5 15.0951 17.27 15.6451C16.97 16.3751 16.38 16.9651 15.65 17.2651C15.1 17.4951 14.53 17.4951 13.5 17.4951ZM13.5 11.4951C12.78 11.4951 12.3 11.4951 12.12 11.5751C11.87 11.6751 11.68 11.8651 11.58 12.1151C11.5 12.3051 11.5 12.7751 11.5 13.4951C11.5 14.2151 11.5 14.6951 11.58 14.8751C11.68 15.1151 11.88 15.3151 12.12 15.4151C12.3 15.4951 12.78 15.4951 13.5 15.4951C14.22 15.4951 14.7 15.4951 14.88 15.4151C15.12 15.3151 15.32 15.1151 15.42 14.8751C15.5 14.6951 15.5 14.2151 15.5 13.4951C15.5 12.7751 15.5 12.2951 15.42 12.1151C15.32 11.8651 15.13 11.6751 14.88 11.5751C14.7 11.4951 14.22 11.4951 13.5 11.4951Z"
+                fill="white" />
+            </svg>
+          </div>
+          <div class="sort-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M11.7071 16.7071C12.0976 16.3166 12.0976 15.6834 11.7071 15.2929C11.3166 14.9024 10.6834 14.9024 10.2929 15.2929L11.7071 16.7071ZM8 19L7.29289 19.7071C7.68342 20.0976 8.31658 20.0976 8.70711 19.7071L8 19ZM5.70711 15.2929C5.31658 14.9024 4.68342 14.9024 4.29289 15.2929C3.90237 15.6834 3.90237 16.3166 4.29289 16.7071L5.70711 15.2929ZM12.2929 7.29289C11.9024 7.68342 11.9024 8.31658 12.2929 8.70711C12.6834 9.09763 13.3166 9.09763 13.7071 8.70711L12.2929 7.29289ZM16 5L16.7071 4.29289C16.3166 3.90237 15.6834 3.90237 15.2929 4.29289L16 5ZM18.2929 8.70711C18.6834 9.09763 19.3166 9.09763 19.7071 8.70711C20.0976 8.31658 20.0976 7.68342 19.7071 7.29289L18.2929 8.70711ZM15 19C15 19.5523 15.4477 20 16 20C16.5523 20 17 19.5523 17 19H15ZM9 5C9 4.44772 8.55229 4 8 4C7.44772 4 7 4.44772 7 5L9 5ZM10.2929 15.2929L7.29289 18.2929L8.70711 19.7071L11.7071 16.7071L10.2929 15.2929ZM8.70711 18.2929L5.70711 15.2929L4.29289 16.7071L7.29289 19.7071L8.70711 18.2929ZM13.7071 8.70711L16.7071 5.70711L15.2929 4.29289L12.2929 7.29289L13.7071 8.70711ZM15.2929 5.70711L18.2929 8.70711L19.7071 7.29289L16.7071 4.29289L15.2929 5.70711ZM17 19L17 5L15 5L15 19H17ZM7 5L7 19H9L9 5L7 5Z"
+                fill="white" />
+            </svg>
+          </div>
+        </div>
       </div>
-    </div>
+    </header>
 
-    <!-- 解析前の埋め込みエリア -->
-    <div class="pre-embed-container">
-      <div class="text">検索バーから動画を選んでください</div>
-    </div>
 
-    <!-- セグメント選択 -->
-    <div class="segment-container">
-      <button class="tab comment-tab" onclick="selectTab('comment')">💬</button>
-      <button class="tab graph-tab active" onclick="selectTab('graph')">📊</button>
-      <button class="tab info-tab" onclick="selectTab('info')">ℹ️</button>
-    </div>
 
-    <!-- グラフエリア -->
-    <div class="graph-display-area">
-      グラフがここに表示されます
-    </div>
+    <!-- ウォッチリスト -->
+    <section class="watchlist">
+      <h1 class="watchlist-title">ウォッチリスト</h1>
 
-    <!-- グラフ選択 -->
-    <div class="graph-segment">
-      <button class="graph-tab bar-tab active" onclick="selectGraph('bar')">▇</button>
-      <button class="graph-tab line-tab" onclick="selectGraph('line')">📈</button>
-    </div>
+      <!-- 1つ目のリストグループ（のばまんゲームス） -->
+      <div class="watchlist-group">
+        <h3 class="watchlist-group-title">のばまんゲームス</h3>
+        <div class="watchlist-items">
+          <div class="watchlist-item">
+            <div class="watchlist-thumbnail"></div>
+            <div class="watchlist-info">
+              <div class="watchlist-title-text">マインクラフトで最強建築</div>
+              <div class="watchlist-channel">のばまん</div>
+            </div>
+          </div>
+          <div class="watchlist-item">
+            <div class="watchlist-thumbnail"></div>
+            <div class="watchlist-info">
+              <div class="watchlist-title-text">ポケモン新作ガチ攻略</div>
+              <div class="watchlist-channel">のばまん</div>
+            </div>
+          </div>
+          <div class="watchlist-item">
+            <div class="watchlist-thumbnail"></div>
+            <div class="watchlist-info">
+              <div class="watchlist-title-text">ゼルダの伝説 100時間耐久</div>
+              <div class="watchlist-channel">のばまん</div>
+            </div>
+          </div>
+          <div class="watchlist-item">
+            <div class="watchlist-thumbnail"></div>
+            <div class="watchlist-info">
+              <div class="watchlist-title-text">新作FPS神ゲー発見</div>
+              <div class="watchlist-channel">のばまん</div>
+            </div>
+          </div>
+          <div class="watchlist-item">
+            <div class="watchlist-thumbnail"></div>
+            <div class="watchlist-info">
+              <div class="watchlist-title-text">逆転裁判の衝撃ラスト</div>
+              <div class="watchlist-channel">のばまん</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2つ目のリストグループ（ホロライブ） -->
+      <div class="watchlist-group">
+        <h3 class="watchlist-group-title">ホロライブ</h3>
+        <div class="watchlist-items">
+          <div class="watchlist-item">
+            <div class="watchlist-thumbnail"></div>
+            <div class="watchlist-info">
+              <div class="watchlist-title-text">ホロメン新衣装お披露目</div>
+              <div class="watchlist-channel">ホロライブ公式</div>
+            </div>
+          </div>
+          <div class="watchlist-item">
+            <div class="watchlist-thumbnail"></div>
+            <div class="watchlist-info">
+              <div class="watchlist-title-text">ホロライブ歌枠まとめ</div>
+              <div class="watchlist-channel">ホロライブ公式</div>
+            </div>
+          </div>
+          <div class="watchlist-item">
+            <div class="watchlist-thumbnail"></div>
+            <div class="watchlist-info">
+              <div class="watchlist-title-text">ホロライブ3Dライブ！</div>
+              <div class="watchlist-channel">ホロライブ公式</div>
+            </div>
+          </div>
+          <div class="watchlist-item">
+            <div class="watchlist-thumbnail"></div>
+            <div class="watchlist-info">
+              <div class="watchlist-title-text">ホロメン耐久マイクラ</div>
+              <div class="watchlist-channel">ホロライブ公式</div>
+            </div>
+          </div>
+          <div class="watchlist-item">
+            <div class="watchlist-thumbnail"></div>
+            <div class="watchlist-info">
+              <div class="watchlist-title-text">ホロメン全員コラボ配信</div>
+              <div class="watchlist-channel">ホロライブ公式</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3つ目のリストグループ（ゲーム実況） -->
+      <div class="watchlist-group">
+        <h3 class="watchlist-group-title">ゲーム実況</h3>
+        <div class="watchlist-items">
+          <div class="watchlist-item">
+            <div class="watchlist-thumbnail"></div>
+            <div class="watchlist-info">
+              <div class="watchlist-title-text">バイオハザード実況プレイ</div>
+              <div class="watchlist-channel">実況プレイヤーA</div>
+            </div>
+          </div>
+          <div class="watchlist-item">
+            <div class="watchlist-thumbnail"></div>
+            <div class="watchlist-info">
+              <div class="watchlist-title-text">FF14でガチ攻略</div>
+              <div class="watchlist-channel">実況プレイヤーB</div>
+            </div>
+          </div>
+          <div class="watchlist-item">
+            <div class="watchlist-thumbnail"></div>
+            <div class="watchlist-info">
+              <div class="watchlist-title-text">スマブラ最強キャラ決定戦</div>
+              <div class="watchlist-channel">実況プレイヤーC</div>
+            </div>
+          </div>
+          <div class="watchlist-item">
+            <div class="watchlist-thumbnail"></div>
+            <div class="watchlist-info">
+              <div class="watchlist-title-text">新作ホラー耐久配信</div>
+              <div class="watchlist-channel">実況プレイヤーD</div>
+            </div>
+          </div>
+          <div class="watchlist-item">
+            <div class="watchlist-thumbnail"></div>
+            <div class="watchlist-info">
+              <div class="watchlist-title-text">レトロゲーム実況シリーズ</div>
+              <div class="watchlist-channel">実況プレイヤーE</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ボトムナビゲーション -->
+    <nav class="bottom-nav">
+      <!-- ホーム -->
+      <div class="nav-item active">
+        <div class="nav-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="29" height="28" viewBox="0 0 29 28" fill="none">
+            <g filter="url(#filter0_d_88_62)">
+              <path
+                d="M23.75 19.6958V13.5851V13.5843C23.75 12.9963 23.75 12.7022 23.6769 12.4284C23.6122 12.1857 23.5055 11.9556 23.3616 11.748C23.1992 11.5138 22.9732 11.3201 22.5209 10.9326L17.1208 6.30655C16.2809 5.58701 15.8609 5.22728 15.3883 5.09043C14.9718 4.96986 14.5282 4.96986 14.1117 5.09043C13.6393 5.2272 13.2198 5.58661 12.3807 6.30537L12.3794 6.30655L6.97937 10.9326L6.97829 10.9335C6.52661 11.3204 6.30062 11.514 6.13837 11.748C5.99447 11.9556 5.88787 12.1857 5.82309 12.4284C5.75 12.7023 5.75 12.9966 5.75 13.5851V19.6958C5.75 20.7222 5.75 21.2353 5.92127 21.6401C6.14963 22.1799 6.58791 22.6087 7.13922 22.8323C7.55271 23 8.07689 23 9.12526 23C10.1736 23 10.6976 23 11.111 22.8323C11.6624 22.6087 12.1003 22.1799 12.3286 21.6401C12.4999 21.2353 12.5 20.7221 12.5 19.6957V18.5943C12.5 17.3776 13.5074 16.3914 14.75 16.3914C15.9926 16.3914 17 17.3776 17 18.5943V19.6957C17 20.7221 17 21.2353 17.1713 21.6401C17.3996 22.1799 17.8379 22.6087 18.3892 22.8323C18.8027 23 19.3269 23 20.3753 23C21.4236 23 21.9476 23 22.361 22.8323C22.9124 22.6087 23.3503 22.1799 23.5786 21.6401C23.7499 21.2353 23.75 20.7222 23.75 19.6958Z"
+                fill="white" />
+            </g>
+            <defs>
+              <filter id="filter0_d_88_62" x="0.75" y="0" width="28" height="28" filterUnits="userSpaceOnUse"
+                color-interpolation-filters="sRGB">
+                <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                  result="hardAlpha" />
+                <feOffset />
+                <feGaussianBlur stdDeviation="2.5" />
+                <feComposite in2="hardAlpha" operator="out" />
+                <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.5 0" />
+                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_88_62" />
+                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_88_62" result="shape" />
+              </filter>
+            </defs>
+          </svg>
+        </div>
+        <span class="nav-text">ホーム</span>
+      </div>
+
+      <!-- 探す -->
+      <div class="nav-item">
+        <div class="nav-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
+            <path
+              d="M15.9571 14.2929C15.5666 13.9024 14.9334 13.9024 14.5429 14.2929C14.1524 14.6834 14.1524 15.3166 14.5429 15.7071L15.9571 14.2929ZM20.5429 21.7071C20.9334 22.0976 21.5666 22.0976 21.9571 21.7071C22.3476 21.3166 22.3476 20.6834 21.9571 20.2929L20.5429 21.7071ZM10.25 16C6.93629 16 4.25 13.3137 4.25 10H2.25C2.25 14.4183 5.83172 18 10.25 18V16ZM4.25 10C4.25 6.68629 6.93629 4 10.25 4V2C5.83172 2 2.25 5.58172 2.25 10H4.25ZM10.25 4C13.5637 4 16.25 6.68629 16.25 10H18.25C18.25 5.58172 14.6683 2 10.25 2V4ZM16.25 10C16.25 13.3137 13.5637 16 10.25 16V18C14.6683 18 18.25 14.4183 18.25 10H16.25ZM14.5429 15.7071L20.5429 21.7071L21.9571 20.2929L15.9571 14.2929L14.5429 15.7071Z"
+              fill="#909090" />
+          </svg>
+        </div>
+        <span class="nav-text">探す</span>
+      </div>
+
+      <!-- ブックマーク -->
+      <div class="nav-item">
+        <div class="nav-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="18" viewBox="0 0 14 18" fill="none">
+            <path
+              d="M4.47767 15.833L4.47771 15.8329L4.48006 15.8313L4.47767 15.833ZM4.47767 15.833C3.85267 16.2587 3.42452 16.5497 3.09058 16.7464C2.74827 16.948 2.61194 16.9837 2.56762 16.9897C2.08461 17.0553 1.59934 16.8003 1.37274 16.328C1.34838 16.2772 1.30134 16.1328 1.27562 15.7288C1.25048 15.3339 1.25 14.8067 1.25 14.0399V3.54171C1.25 2.90569 1.25075 2.48757 1.27634 2.16758C1.30104 1.85867 1.34403 1.72918 1.38104 1.65497C1.49594 1.42457 1.67692 1.24156 1.89453 1.12828C1.95986 1.09427 2.07882 1.05156 2.37675 1.02669C2.68693 1.00081 3.09331 1 3.71688 1H9.78355C10.4071 1 10.8133 1.00081 11.1232 1.02669C11.4207 1.05154 11.5396 1.09421 11.605 1.12828C11.8233 1.2419 12.0046 1.42524 12.1192 1.65497C12.1561 1.72899 12.199 1.8582 12.2237 2.16654C12.2493 2.48595 12.25 2.90326 12.25 3.53807V3.54171V14.0399V14.0403C12.25 14.807 12.2495 15.334 12.2244 15.7289C12.1987 16.1329 12.1516 16.2772 12.1273 16.328C11.9006 16.8004 11.4155 17.0553 10.9326 16.9897C10.8881 16.9836 10.7515 16.9479 10.409 16.7463C10.0749 16.5496 9.64654 16.2586 9.0217 15.833C9.02116 15.8326 9.02062 15.8323 9.02008 15.8319M4.47767 15.833L9.02008 15.8319M9.02008 15.8319C8.99277 15.8133 8.96576 15.7949 8.93901 15.7766C8.53307 15.4996 8.18821 15.2642 7.81116 15.1281C7.12447 14.8801 6.37465 14.8801 5.68797 15.1281C5.31133 15.2641 4.9671 15.499 4.56247 15.7751C4.5353 15.7937 4.50785 15.8124 4.4801 15.8313L9.02008 15.8319Z"
+              stroke="#909090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <span class="nav-text">ブックマーク</span>
+      </div>
+
+      <!-- 設定 -->
+      <div class="nav-item">
+        <div class="nav-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
+            <path
+              d="M20.9102 15.1526V8.84766V8.84292C20.9102 8.17302 20.9102 7.83743 20.8125 7.53687C20.7259 7.27031 20.5844 7.02491 20.3968 6.81662C20.1856 6.58205 19.8948 6.41416 19.3161 6.08003L19.3099 6.07643L13.8496 2.92395L13.8441 2.92075C13.2649 2.58636 12.9749 2.41893 12.666 2.35328C12.3919 2.295 12.1087 2.295 11.8346 2.35328C11.5247 2.41914 11.2326 2.58742 10.6497 2.92395L5.18945 6.07643C4.60657 6.41296 4.31548 6.58121 4.10352 6.81662C3.91597 7.02491 3.77434 7.27031 3.68773 7.53687C3.58984 7.83813 3.58984 8.1746 3.58984 8.84766V15.1526C3.58984 15.8257 3.58984 16.1622 3.68773 16.4634C3.77434 16.73 3.91597 16.9754 4.10352 17.1837C4.31548 17.4191 4.60657 17.5874 5.18945 17.924L10.6497 21.0764C11.2326 21.413 11.5247 21.5812 11.8346 21.6471C12.1087 21.7053 12.3919 21.7053 12.666 21.6471C12.9759 21.5812 13.2677 21.413 13.8506 21.0764L19.3108 17.924C19.8937 17.5874 20.1849 17.4191 20.3968 17.1837C20.5844 16.9754 20.7259 16.73 20.8125 16.4634C20.9102 16.1629 20.9102 15.8273 20.9102 15.1574V15.1526Z"
+              stroke="#909090" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <span class="nav-text">設定</span>
+      </div>
+    </nav>
+
+
   </div>
+  <script>
+    // スクロール時のみスクロールバーを表示
+    const watchlist = document.querySelector('.watchlist');
+
+    let scrollTimeout;
+
+    watchlist.addEventListener('scroll', () => {
+      watchlist.classList.add('scrolling');
+
+      // スクロールが止まったら非表示にする
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        watchlist.classList.remove('scrolling');
+      }, 1000); // 1秒後にフェードアウト
+    });
+  </script>
 </body>
+
 </html>
