@@ -80,11 +80,29 @@
       box-sizing: border-box;
     }
 
-    /* 左側 (ハンバーガーメニュー) */
+    /* ヘッダー左側コンテナ (ハンバーガーメニュー + 空きスペース) */
     .header-left {
       display: flex;
       align-items: center;
+      gap: 16px;
     }
+
+    /* ハンバーガーメニュー用アイコン */
+    .hamburger-menu {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+    }
+
+    /* 空きスペースコンテナ */
+    .spacer {
+      width: 24px;
+      height: 24px;
+    }
+
 
     /* 中央 (ロゴ) */
     .header-logo {
@@ -267,7 +285,7 @@
     .bottom-nav {
       display: flex;
       position: fixed;
-      bottom: 16px;
+      bottom: 32px;
       /* 下部に固定 */
       left: 16px;
       right: 16px;
@@ -339,15 +357,16 @@
     <!-- ヘッダー -->
     <header class="header">
       <div class="header-container">
-        <!-- 左側 (ハンバーガーメニュー) -->
-        <div class="header-left">
-          <div class="hamburger-menu">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M5 17H19M5 12H19M5 7H19" stroke="white" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" />
-            </svg>
-          </div>
+      <!-- 左側 (ハンバーガーメニュー + スペース) -->
+      <div class="header-left">
+        <div class="hamburger-menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M5 17H19M5 12H19M5 7H19" stroke="white" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
         </div>
+        <div class="spacer"></div> <!-- 余白用コンテナ -->
+      </div>
 
         <!-- 中央 (ロゴ) -->
         <div class="header-logo">YAV</div>
